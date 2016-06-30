@@ -1,0 +1,1 @@
+scp -r tianyang@158.130.48.14:~/mode_change_scripts/trace_proc_output/* /home/tim/modechange/
