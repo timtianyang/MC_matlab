@@ -4,8 +4,8 @@ fileID = fopen(strcat(testDir,'schedule.txt'));
 C = textscan(fileID,'%*s %u64 %*s %s %*s %*s %*s %*s %s %*s %*s %s %*s %*s %*s %*s %*s %s %*s');
 fclose(fileID);
 time = C{1};
-deadline = C{4};
-deadline_start = hex2dec(deadline{1}(3:end-1));
+deadline_ = C{4};
+deadline_start = hex2dec(deadline_{1}(3:end-1));
 
 start = time(1);
 %delta = C{2};
@@ -19,19 +19,18 @@ old_mode = 0; %assuming only the transition is traced
 new_mode = 0;
 
 nr_vcpu = 0;
+deadline = 0;
+deadline_start = 0;
 vcpu=0;
 for i = 1:length(vcpu_)  
     s2 = vcpu_{i};
-    deadline{i} = deadline{i}(3:end-1);
-    deadline{i} = hex2dec(deadline{i});
-    if deadline{i}<0
-         deadline{i} = 0;
-    else
-         deadline{i} =  double(deadline{i}-deadline_start)/1000000; %deadline in ms
-    end
+    
+    deadline_{i} = deadline_{i}(3:end-1); 
+    d =  hex2dec(sprintf('%s', deadline_{i}));
+    deadline(i) = d;
+    
     
     vcpu_{i} =s2(end-2:end-1);
-    
     v = hex2dec(sprintf('%s', vcpu_{i}));
     vcpu(i) = v;
     if v ~= 64
@@ -45,7 +44,14 @@ for i = 1:length(vcpu_)
     end
 end
 nr_vcpu = nr_vcpu+1;
-old_mode= new_mode-1; %assume one transition only
+deadline_start = deadline(1);
+ %assume one transition only
+for i = 1:nr_vcpu
+    new_mode(i) = max(mode(vcpu == i-1));
+    old_mode(i) = min(mode(vcpu == i-1));
+end
+
+
 idle_vcpu_id = 64;
 
 ms = ticks_to_ms(time);
@@ -60,7 +66,7 @@ for i = 1:(length(time) - 1)
    
    rectangle('Position',pos,'FaceColor',color);
    if add_text == 1 && vcpu(i) ~= idle_vcpu_id 
-       label = strcat('v',int2str(vcpu(i)),' m',int2str(mode(i)),[char(10) 'd'],num2str(deadline{i}));
+       label = strcat('v',int2str(vcpu(i)),' m',int2str(mode(i)),[char(10) 'd'],num2str(deadline(i)-deadline_start));
    	   h=text(ms(i),-5,label);
        set(h,'Clipping','on')
    end
@@ -79,33 +85,58 @@ mcr = ticks_to_ms(mcr_time);
 
 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %finding the endpoint of modechange
-%two arrays representing two different types of endpoint
+%three arrays representing two different types of endpoint
 release_new = find_release_new(testDir,nr_vcpu,mcr);
+
+
 finish_old = zeros(nr_vcpu,1);
 
-%this loop can find the release new easily but need another loop
-%to find finish_old
-release_v = 0;
 
-
-
+%find the start of the last old job
+%if a vcpu is new, which has the same new_mode and old_mode
+%dont do the calculation
 for i = 1:length(vcpu) 
-    if (vcpu(i) ~= idle_vcpu_id )
-        if (finish_old(vcpu(i)+1) < ms(i) && mode(i) == old_mode)
+    t = ms(vcpu == vcpu(i));%the first time that this job is scheduled, can be compared with mcr to see if its new or old
+    if (vcpu(i) ~= idle_vcpu_id && ((new_mode(vcpu(i)+1) ~= old_mode(vcpu(i)+1)) || mcr(1)> t(1)))
+        if (finish_old(vcpu(i)+1) < ms(i) && mode(i) == old_mode(vcpu(i)+1))
             finish_old(vcpu(i)+1) = ms(i);
         end
     end
 end
+%shift to the finish of the last old job
+%if a vcpu is new, which has the same new_mode and old_mode
+%dont do the calculation
+%The last old job is always at the end so no need to worry about preemption
 for i = 1:length(vcpu)
-    if (vcpu(i) ~= idle_vcpu_id )
+     if (vcpu(i) ~= idle_vcpu_id && ((new_mode(vcpu(i)+1) ~= old_mode(vcpu(i)+1)) || mcr(1)> t(1)))
         if(finish_old(vcpu(i)+1) == ms(i))
             finish_old(vcpu(i)+1) = ms(i+1);
         end
     end
 end
+
+[all_finish_old_and_first_new,end_point3] = find_all_finish_old_and_first_new(nr_vcpu,vcpu,ms,deadline,finish_old,mode,new_mode,old_mode,mcr(1));
+
+end_point3_delay = end_point3-mcr(1);
+label = 'endpoint3';
+       h=text(end_point3,-12.8,label);
+       set(h,'Clipping','on')
+
+for i = 1:nr_vcpu
+   if all_finish_old_and_first_new(i) ~= 0
+       label = strcat('v',int2str(i-1),[char(10) 'f'],'inish new');
+       h=text(all_finish_old_and_first_new(i),-12.8,label);
+       set(h,'Clipping','on')
+   end
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 hold on
+
+
 
 %two arrays storing two different types of mcr duration calculated from
 %previous arrays
