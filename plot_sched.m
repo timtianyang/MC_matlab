@@ -125,7 +125,7 @@ label = 'endpoint3';
        set(h,'Clipping','on')
 
 for i = 1:nr_vcpu
-   if all_finish_old_and_first_new(i) ~= 0
+   if all_finish_old_and_first_new(i) ~= 0 && all_finish_old_and_first_new(i)~=finish_old(i) %for old vcpu dont print finnish new
        label = strcat('v',int2str(i-1),[char(10) 'f'],'inish new');
        h=text(all_finish_old_and_first_new(i),-12.8,label);
        set(h,'Clipping','on')

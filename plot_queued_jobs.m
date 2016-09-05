@@ -14,7 +14,7 @@ if length(C{1}) ~= 0
     for i = 1:length(vcpu__)  
         s2 = vcpu__{i};
         vcpu__{i} = s2(end-2:end-1);
-        v = sscanf(sprintf('%s ', vcpu__{i}), '%d') +1;
+        v = sscanf(sprintf('%s ', vcpu__{i}), '%d');
 
         vcpu(i) = v;
         deadline{i} = deadline{i}(3:end-1);
