@@ -121,14 +121,17 @@ end
 
 end_point3_delay = end_point3-mcr(1);
 label = 'endpoint3';
-       h=text(end_point3,-12.8,label);
-       set(h,'Clipping','on')
+h=text(end_point3,-12.8,label);
+set(h,'Clipping','on')
 
+vcpu_endpoint3_latency = zeros(1,nr_vcpu);
 for i = 1:nr_vcpu
+    vcpu_endpoint3_latency(i) = all_finish_old_and_first_new(i) - mcr(1);
    if all_finish_old_and_first_new(i) ~= 0 && all_finish_old_and_first_new(i)~=finish_old(i) %for old vcpu dont print finnish new
        label = strcat('v',int2str(i-1),[char(10) 'f'],'inish new');
        h=text(all_finish_old_and_first_new(i),-12.8,label);
        set(h,'Clipping','on')
+       
    end
 end
 

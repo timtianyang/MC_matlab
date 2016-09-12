@@ -1,6 +1,5 @@
 clear; clc;hold on
-%unix('./transfer')
-
+%unix('./transfer');
 
 
 testNum = 0;
@@ -28,6 +27,7 @@ release_new_valid_run = 0;
 endpoint1trend = 0; %first new job release
 endpoint2trend = 0; %all old jobs finished
 endpoint3trend = 0; %first new jobs of this vcpu have been finished
+
 
 totalTest = 30;
 
@@ -68,9 +68,9 @@ while testNum<totalTest
     end
     %init trend arrays
     if endpoint1trend == 0
-        endpoint1trend = zeros(nr_vcpu,totalTest);
-        endpoint2trend = zeros(nr_vcpu,totalTest);
-        endpoint3trend = zeros(nr_vcpu,totalTest);
+        endpoint1trend = zeros(nr_vcpu+1,totalTest);%plus one to include the protocol trend
+        endpoint2trend = zeros(nr_vcpu+1,totalTest);
+        endpoint3trend = zeros(nr_vcpu+1,totalTest);
     end
     
     for p=1:nr_vcpu
@@ -88,21 +88,32 @@ while testNum<totalTest
             endpoint1trend(p,testNum+1) = mcr_latency_release_new(p);
         end
         
-        endpoint3trend(p,testNum+1) = all_finish_old_and_first_new(p);%all_finish_old_and_first_new has the endpoint3
+        endpoint3trend(p,testNum+1) = vcpu_endpoint3_latency(p);%only want the latency from mcr
+        
         %delay for each individual vcpu. end_point3_delay simply finds the
         %max in the array.
+        
+        
+        
     end
     
-
+    
+    
     average_end_point3_delay = average_end_point3_delay + end_point3_delay;
     
     %savefig(strcat(testDir,'plot.fig'))
-     while 1 == 1
-         w = waitforbuttonpress;
-        if w ~= 0
-             break;
-         end
-     end
+%      while 1 == 1
+%          w = waitforbuttonpress;
+%         if w ~= 0
+%              break;
+%          end
+%      end
+%     while testNum == 29
+%          w = waitforbuttonpress;
+%         if w ~= 0
+%              break;
+%          end
+%      end
     testNum = testNum+1;
     close all
     
