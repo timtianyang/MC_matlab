@@ -27,11 +27,11 @@ if length(C{1}) ~= 0
     end
   
     for i = 1:length(vcpu)
-        pos = [ms(i),-10.5 - i, 1, 1];
+        pos = [ms(i) + i - 1,-10.5 , 1, 1];
         color = getVcpuColor(vcpu(i),nr_vcpu);
         rectangle('Position',pos,'FaceColor',color);
         label = strcat('v',int2str(vcpu(i)),' m',num2str(mode{i}),[char(10) 'd'],num2str(deadline{i}));
-        h = text(ms(i),-10 - i,label);
+        h = text(ms(i) + i - 1,-10 ,label);
         set(h,'Clipping','on')
     end
 end

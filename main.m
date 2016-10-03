@@ -28,13 +28,23 @@ endpoint1trend = 0; %first new job release
 endpoint2trend = 0; %all old jobs finished
 endpoint3trend = 0; %first new jobs of this vcpu have been finished
 
+maxendpoint1 = 0;
+maxendpoint2 = 0;
+maxendpoint3 = 0;
 
+
+
+printTestDetail = 0;
 totalTest = 30;
 
 while testNum<totalTest
     
     testDir = strcat('modechange/test',int2str(testNum),'/');
     fig = figure(1);
+    
+    
+    parse_mode_change_info
+    
     plot_sched
 
 
@@ -63,6 +73,7 @@ while testNum<totalTest
     if average_finish_old_delay == 0
         average_finish_old_delay = zeros(nr_vcpu,1);
         average_release_new_delay = zeros(nr_vcpu,1);
+        average_end_point3_delay = zeros(nr_vcpu,1);
         finish_old_valid_run = zeros(nr_vcpu,1);
         release_new_valid_run = zeros(nr_vcpu,1);
     end
@@ -73,12 +84,19 @@ while testNum<totalTest
         endpoint3trend = zeros(nr_vcpu+1,totalTest);
     end
     
+    max_release_new_delay = 0;
+    max_finish_old_delay = 0;
+    max_finish_old_and_first_new_delay = 0;
+    
     for p=1:nr_vcpu
-        
         if mcr_latency_finish_old(p)>=0
             average_finish_old_delay(p) = average_finish_old_delay(p) + mcr_latency_finish_old(p);
             finish_old_valid_run(p) = finish_old_valid_run(p)+1;
             endpoint2trend(p,testNum+1) = mcr_latency_finish_old(p);
+            
+            if max_finish_old_delay < mcr_latency_finish_old(p)
+                max_finish_old_delay = mcr_latency_finish_old(p);
+            end
         end
         
         
@@ -86,20 +104,28 @@ while testNum<totalTest
             average_release_new_delay(p) = average_release_new_delay(p) + mcr_latency_release_new(p);
             release_new_valid_run(p) = release_new_valid_run(p)+1;
             endpoint1trend(p,testNum+1) = mcr_latency_release_new(p);
+            
+            if max_release_new_delay < mcr_latency_release_new(p)
+                max_release_new_delay = mcr_latency_release_new(p);
+            end
         end
+        
+        average_end_point3_delay(p) = average_end_point3_delay(p) + vcpu_endpoint3_latency(p);
         
         endpoint3trend(p,testNum+1) = vcpu_endpoint3_latency(p);%only want the latency from mcr
         
+        if max_finish_old_and_first_new_delay < vcpu_endpoint3_latency(p)
+              max_finish_old_and_first_new_delay = vcpu_endpoint3_latency(p);
+        end
         %delay for each individual vcpu. end_point3_delay simply finds the
         %max in the array.
-        
-        
-        
     end
+    maxendpoint1(testNum + 1) = max_release_new_delay;
+    maxendpoint2(testNum + 1) = max_finish_old_delay;
+    maxendpoint3(testNum + 1) = max_finish_old_and_first_new_delay;
     
     
-    
-    average_end_point3_delay = average_end_point3_delay + end_point3_delay;
+    %average_end_point3_delay = average_end_point3_delay + end_point3_delay;
     
     %savefig(strcat(testDir,'plot.fig'))
 %      while 1 == 1
@@ -123,7 +149,7 @@ end
 %only use positive delay as valid run.
 average_finish_old_delay = average_finish_old_delay./finish_old_valid_run
 average_release_new_delay = average_release_new_delay./release_new_valid_run
-average_end_point3_delay = average_end_point3_delay/totalTest
+average_end_point3_delay = average_end_point3_delay./totalTest
 
 %plotting the endpoint trend
 figure(3)
@@ -131,25 +157,34 @@ x = 1:totalTest;
 j = 0;
 for i=1:nr_vcpu
     j = j+1;
-    subplot(nr_vcpu,3,j)
-    plot(x,endpoint1trend(i:i,:));
-    ylabel(strcat('vcpu',num2str(i-1)))
+    subplot(nr_vcpu+1,3,j)
+    plot(x,endpoint1trend(i:i,:),'-*');
+    ylabel(sprintf('vcpu%d\n%s',i-1,strjoin(vcpu_type(i))))
     if j==1
         title('endpoint1- first new job release')
     end
     j = j+1;
-    subplot(nr_vcpu,3,j)
-    plot(x,endpoint2trend(i:i,:));
-    ylabel(strcat('vcpu',num2str(i-1)))
+    subplot(nr_vcpu+1,3,j)
+    plot(x,endpoint2trend(i:i,:),'-*');
+    
     if j==2
         title('endpoint2- all old jobs finished')
     end
     j = j+1;
-    subplot(nr_vcpu,3,j)
-    plot(x,endpoint3trend(i:i,:));
-    ylabel(strcat('vcpu',num2str(i-1)))
+    subplot(nr_vcpu+1,3,j)
+    plot(x,endpoint3trend(i:i,:),'-*');
+    
     if j==3
         title('endpoint3- all old jobs and first new job finished')
     end
 end
-
+j = j+1;
+subplot(nr_vcpu+1, 3, j);
+plot(x, maxendpoint1,'-*');
+ylabel('max of all vcpu')
+j = j+1;
+subplot(nr_vcpu+1, 3, j);
+plot(x, maxendpoint2,'-*');
+j = j+1;
+subplot(nr_vcpu+1, 3, j);
+plot(x, maxendpoint3,'-*');

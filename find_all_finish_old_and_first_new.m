@@ -1,10 +1,10 @@
-function [all_finish_old_and_first_new,end_point3] = find_all_finish_old_and_first_new(nr_vcpu,vcpu,ms,deadline,finish_old,mode,new_mode,old_mode,mcr)
+function [all_finish_old_and_first_new,end_point3] = find_all_finish_old_and_first_new(nr_vcpu,vcpu,ms,deadline,finish_old,mode,new_mode,old_mode,mcr,vcpu_type)
     all_finish_old_and_first_new = zeros(nr_vcpu,1);
     
     %find the time the first job in the new mode is finished
     for i=1:nr_vcpu
         t = ms(vcpu == i-1);
-        if (new_mode(i) ~= old_mode(i) || mcr < t(1)) %skip for old vcpus. mcr < t(1) means new vcpus
+        if (strcmp(vcpu_type(i),'old') ~= 1) %skip for old vcpus.
             v = vcpu(vcpu == i-1);
             d = deadline(vcpu == i-1);
             m = mode(vcpu == i-1);
