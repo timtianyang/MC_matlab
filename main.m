@@ -1,12 +1,12 @@
 clear; clc;hold on
-%unix('./transfer');
+unix('./transfer');
 
 
 testNum = 0;
 %endpoint 1: the average delay when finishing old jobs for each vcpu.
 %sometimes the mcr happens after all old jobs are finished so the actual
 %number of valid numbers may vary. Do the check to filter out negative
-%values
+%values:q
 average_finish_old_delay = 0; %max 64
 
 %endpoint 2: the average delay when releasing the first new job for each vcpu.
@@ -32,6 +32,11 @@ maxendpoint1 = 0;
 maxendpoint2 = 0;
 maxendpoint3 = 0;
 
+%these records average over all tests
+schedule_time = 0; %time spent in the schedule function
+context_time = 0;
+repl_time = 0;
+mc_time = 0; %time spent in mc logic(not including passing)
 
 
 printTestDetail = 0;
@@ -63,6 +68,8 @@ while testNum<totalTest
     plot_update_changed
 
     plot_queued_jobs
+    
+    xen_bench
     
     set(fig, 'Units', 'normalized', 'Position', [0,0,1,1]);
     ylabel(strcat('test ',int2str(testNum)))
@@ -124,8 +131,12 @@ while testNum<totalTest
     maxendpoint2(testNum + 1) = max_finish_old_delay;
     maxendpoint3(testNum + 1) = max_finish_old_and_first_new_delay;
     
+    %sum the average of all tests and find another average
+    schedule_time(testNum + 1) = avg_sched_overhead;
+    context_time(testNum + 1) = avg_context_overhead;
+    repl_time(testNum + 1) = avg_repl_overhead;
+    mc_time(testNum + 1) = avg_mc_overhead; 
     
-    %average_end_point3_delay = average_end_point3_delay + end_point3_delay;
     
     %savefig(strcat(testDir,'plot.fig'))
 %      while 1 == 1
@@ -150,16 +161,22 @@ end
 average_finish_old_delay = average_finish_old_delay./finish_old_valid_run
 average_release_new_delay = average_release_new_delay./release_new_valid_run
 average_end_point3_delay = average_end_point3_delay./totalTest
+average_schedule_time = mean(schedule_time)
+average_context_time = mean(context_time)
+average_repl_time = mean(repl_time)
+average_mc_time = mean(mc_time)
 
 %plotting the endpoint trend
-figure(3)
 x = 1:totalTest;
+
+
+figure(3)
 j = 0;
 for i=1:nr_vcpu
     j = j+1;
     subplot(nr_vcpu+1,3,j)
     plot(x,endpoint1trend(i:i,:),'-*');
-    ylabel(sprintf('vcpu%d\n%s',i-1,strjoin(vcpu_type(i))))
+    ylabel(sprintf('v%d\n%s',i-1,strjoin(vcpu_type(i))))
     if j==1
         title('endpoint1- first new job release')
     end
@@ -178,6 +195,7 @@ for i=1:nr_vcpu
         title('endpoint3- all old jobs and first new job finished')
     end
 end
+%here the last row is the max. Can be used to benchmark a protocol
 j = j+1;
 subplot(nr_vcpu+1, 3, j);
 plot(x, maxendpoint1,'-*');
@@ -188,3 +206,19 @@ plot(x, maxendpoint2,'-*');
 j = j+1;
 subplot(nr_vcpu+1, 3, j);
 plot(x, maxendpoint3,'-*');
+
+
+%plot the micro bench mark fo all tests
+figure(4)
+subplot(2,2,1);
+plot(x,schedule_time,'-*');
+title('schedule overhead ns')
+subplot(2,2,2);
+plot(x,context_time,'-*');
+title('context overhead ns')
+subplot(2,2,3);
+plot(x,repl_time,'-*');
+title('repl overhead ns')
+subplot(2,2,4);
+plot(x,mc_time,'-*');
+title('mc logic overhead ns')
