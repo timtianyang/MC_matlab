@@ -40,9 +40,12 @@ mc_time = 0; %time spent in mc logic(not including passing)
 
 
 printTestDetail = 0;
-totalTest = 30;
+totalTest = 100;
 
 while testNum<totalTest
+    
+
+    
     
     testDir = strcat('modechange/test',int2str(testNum),'/');
     fig = figure(1);
@@ -145,12 +148,12 @@ while testNum<totalTest
 %              break;
 %          end
 %      end
-%     while testNum == 29
-%          w = waitforbuttonpress;
-%         if w ~= 0
-%              break;
-%          end
-%      end
+        while testNum == 9
+        w = waitforbuttonpress;
+        if w ~= 0
+              break;
+         end
+     end
     testNum = testNum+1;
     close all
     
