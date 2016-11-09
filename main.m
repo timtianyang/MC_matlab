@@ -65,6 +65,8 @@ while testNum<totalTest
     plot_backlog
 
     plot_mcr
+    
+    plot_unrunnable
 
     plot_cpu_enable
 
