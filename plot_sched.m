@@ -47,10 +47,12 @@ end
 deadline_start = deadline(1);
  %assume one transition only
 for i = 1:nr_vcpu
-    new_mode(i) = max(mode(vcpu == i-1));
-    old_mode(i) = min(mode(vcpu == i-1));
+    mt = mode(vcpu == i-1);
+    if length(mt) ~= 0
+        new_mode(i) = max(mt);
+        old_mode(i) = min(mt);
+    end
 end
-
 
 idle_vcpu_id = 64;
 

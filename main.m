@@ -1,5 +1,5 @@
 clear; clc;hold on
-unix('./transfer');
+%unix('./transfer');
 
 
 testNum = 0;
@@ -150,16 +150,19 @@ while testNum<totalTest
 %              break;
 %          end
 %      end
-        while testNum == 9
+        while testNum == 83
         w = waitforbuttonpress;
         if w ~= 0
               break;
          end
      end
+
+    testNum
     testNum = testNum+1;
     close all
     
     disp('+++++++++++++++++++++++')
+    
 end
 
 %only use positive delay as valid run.

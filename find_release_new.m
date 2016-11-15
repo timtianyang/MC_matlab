@@ -8,7 +8,6 @@ function release_new = find_release_new(testDir,nr_vcpu,mc_time)
     vcpu_ = C{3};
     vcpu = 0;
 
-    
     for i = 1:length(delta)
         s1 = delta{i};
         s2 = vcpu_{i};

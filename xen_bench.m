@@ -15,7 +15,7 @@ disp(strcat('average sched overhead =',num2str(avg_sched_overhead),'ns'))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fileID = fopen(strcat(testDir,'context_time.txt'));
-C = textscan(fileID,'%*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %s %*s');
+C = textscan(fileID,'%*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %s %*s %*s %*s %s %*s');
 time_hex = C{1};
 time_dec=zeros(length(time_hex) ,1);
 
