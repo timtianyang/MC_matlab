@@ -21,3 +21,4 @@ if length(time) ~= 0
         set(h,'Clipping','on')
     end
 end
+disable_not_running = length(time);

@@ -180,7 +180,7 @@ average_end_point3_delay = average_end_point3_delay./totalTest;
 
 average_disable_running = total_disable_running/totalTest
 average_disable_not_running = total_disable_not_running/totalTest
-average_total_buffer_size = total_buffer_size/totalTest
+average_total_buffer_size 
 
 disp('endpoints')
 for i=1:nr_vcpu

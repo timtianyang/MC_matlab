@@ -35,4 +35,5 @@ if length(C{1}) ~= 0
         set(h,'Clipping','on')
     end
 end
+buffer_size = length(vcpu);
 

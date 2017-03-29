@@ -20,7 +20,6 @@ new_mode = 0;
 
 % nr_vcpu = 0;
 deadline = 0;
-deadline_start = 0;
 vcpu=0;
 for i = 1:length(vcpu_)  
     s2 = vcpu_{i};
@@ -86,7 +85,6 @@ mcr_time = C{1};
 mcr = ticks_to_ms(mcr_time);
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %finding the endpoint of modechange
 %three arrays representing two different types of endpoint
@@ -116,6 +114,9 @@ for i = 1:length(vcpu)
         if(finish_old(vcpu(i)+1) == ms(i))
             finish_old(vcpu(i)+1) = ms(i+1);
         end
+     end
+    if vcpu(i) ~= idle_vcpu_id && new_mode(vcpu(i)+1) == old_mode(vcpu(i)+1) 
+        finish_old(vcpu(i)+1) = 0;
     end
 end
 
@@ -128,10 +129,15 @@ set(h,'Clipping','on')
 
 vcpu_endpoint3_latency = zeros(1,nr_vcpu);
 for i = 1:nr_vcpu
-    vcpu_endpoint3_latency(i) = all_finish_old_and_first_new(i) - mcr(1);
+    if (strcmp(vcpu_type(i),'old') == 1)
+        vcpu_endpoint3_latency(i) = finish_old(i)- mcr(1);
+    else
+        vcpu_endpoint3_latency(i) = all_finish_old_and_first_new(i) - mcr(1);
+    end
     if vcpu_endpoint3_latency(i) < 0
         vcpu_endpoint3_latency(i) = 0;
     end
+    
    if all_finish_old_and_first_new(i) ~= 0 && all_finish_old_and_first_new(i)~=finish_old(i) %for old vcpu dont print finnish new
        label = strcat('v',int2str(i-1),[char(10) 'f'],'inish new');
        h=text(all_finish_old_and_first_new(i),-12.8,label);
