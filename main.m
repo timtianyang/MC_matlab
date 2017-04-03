@@ -189,16 +189,21 @@ for i=1:nr_vcpu
    end
    fprintf('%d & %f & %f & %f \\\\ \n', i-1, average_release_new_delay(i),average_finish_old_delay(i),average_end_point3_delay(i))
 end
-fprintf('\\hline\nmax & %f %f %f \\\\\n\\hline\n',max(average_release_new_delay),max(average_finish_old_delay),max(average_end_point3_delay));
+fprintf('\\hline\nmax & %f & %f & %f \\\\\n\\hline\n',max(average_release_new_delay),max(average_finish_old_delay),max(average_end_point3_delay));
 
-average_schedule_time = mean(schedule_time)
-max_schedule_time = max(schedule_time)
-average_context_time = mean(context_time)
-max_context_time = max(context_time)
-average_repl_time = mean(repl_time)
-max_repl_time = max(repl_time)
-average_mc_time = mean(mc_time)
-max_mc_time = max(mc_time)
+average_schedule_time = mean(schedule_time);
+max_schedule_time = max(schedule_time);
+fprintf('schedule_time %.0f/%.0f\n',average_schedule_time,max_schedule_time);
+average_context_time = mean(context_time);
+max_context_time = max(context_time);
+fprintf('context_time %.0f/%.0f\n',average_context_time,max_context_time);
+average_repl_time = mean(repl_time);
+max_repl_time = max(repl_time);
+fprintf('repl_time %.0f/%.0f\n',average_repl_time,max_repl_time);
+average_mc_time = mean(mc_time);
+max_mc_time = max(mc_time);
+fprintf('mc_time %.0f/%.0f\n',average_mc_time,max_mc_time);
+
 %plotting the endpoint trend
 x = 1:totalTest;
 
