@@ -32,15 +32,6 @@ for i = 1:length(vcpu_)
     vcpu_{i} =s2(end-2:end-1);
     v = hex2dec(sprintf('%s', vcpu_{i}));
     vcpu(i) = v;
-    if v ~= 64
-        if new_mode < mode(i)
-            new_mode = mode(i);
-        end
-% %         if nr_vcpu < v
-% %             nr_vcpu = v;
-% %         end
-%         
-    end
 end
 
 deadline_start = deadline(1);
@@ -94,29 +85,37 @@ release_new = find_release_new(testDir,nr_vcpu,mcr);
 finish_old = zeros(nr_vcpu,1);
 
 
-%find the start of the last old job
-%if a vcpu is new, which has the same new_mode and old_mode
+%find the start of the last instance of the old job
+%the last old job could be preempted!but the start is the last (partial) of
+%the old job.
 %dont do the calculation
+last_old_index = zeros(nr_vcpu,1);
+old_done = 0;
 for i = 1:length(vcpu) 
+    
     if vcpu(i) ~= idle_vcpu_id && strcmp(vcpu_type(vcpu(i)+1),'new') ~= 1
-        t = ms(vcpu == vcpu(i));
-        if (finish_old(vcpu(i)+1) < ms(i) && mode(i) == old_mode(vcpu(i)+1))
+       
+        if ( old_done == 0 && strcmp(vcpu_type(vcpu(i)+1),'old') == 1)%if old don't depend on mode
+            %finish_old(vcpu(i)+1) = ms(length(ms));
+            last_old_index(vcpu(i)+1) = find(vcpu==vcpu(i),1,'last');
+            old_done = 1;
+            %fprintf('vcpu %d is old done\n',vcpu(i));
+            continue
+        %for other types, this will find the last (partial) instance of the
+        %old job
+        elseif (finish_old(vcpu(i)+1) < ms(i) && mode(i) == old_mode(vcpu(i)+1))
             finish_old(vcpu(i)+1) = ms(i);
+            last_old_index(vcpu(i)+1) = i;
+            %fprintf('update finish old vcpu%d\n',vcpu(i));
         end
     end
 end
 %shift to the finish of the last old job
-%if a vcpu is new, which has the same new_mode and old_mode
-%dont do the calculation
 %The last old job is always at the end so no need to worry about preemption
-for i = 1:length(vcpu)
-     if (vcpu(i) ~= idle_vcpu_id && ((new_mode(vcpu(i)+1) ~= old_mode(vcpu(i)+1)) || mcr(1)> t(1)))
-        if(finish_old(vcpu(i)+1) == ms(i))
-            finish_old(vcpu(i)+1) = ms(i+1);
-        end
-     end
-    if vcpu(i) ~= idle_vcpu_id && new_mode(vcpu(i)+1) == old_mode(vcpu(i)+1) 
-        finish_old(vcpu(i)+1) = 0;
+for i = 1:nr_vcpu
+    if ( strcmp(vcpu_type(i),'new') ~= 1) && last_old_index(i)~=0
+        %fprintf('shifting vcpu%d\n',i-1);
+        finish_old(i) = ms(last_old_index(i)+1);
     end
 end
 
@@ -124,7 +123,7 @@ end
 
 end_point3_delay = end_point3-mcr(1);
 label = 'endpoint3';
-h=text(end_point3,-12.8,label);
+h=text(end_point3,-16.8,label);
 set(h,'Clipping','on')
 
 vcpu_endpoint3_latency = zeros(1,nr_vcpu);
@@ -138,9 +137,9 @@ for i = 1:nr_vcpu
         vcpu_endpoint3_latency(i) = 0;
     end
     
-   if all_finish_old_and_first_new(i) ~= 0 && all_finish_old_and_first_new(i)~=finish_old(i) %for old vcpu dont print finnish new
-       label = strcat('v',int2str(i-1),[char(10) 'f'],'inish new');
-       h=text(all_finish_old_and_first_new(i),-12.8,label);
+   if all_finish_old_and_first_new(i) ~= 0 && strcmp(vcpu_type(i),'old') ~= 1 %for old vcpu dont print finnish new
+       label = strcat('v',int2str(i-1),[char(10) 'f'],'in new');
+       h=text(all_finish_old_and_first_new(i),-14.8,label);
        set(h,'Clipping','on')
        
    end
@@ -162,19 +161,19 @@ mcr_latency_release_new = zeros(nr_vcpu,1);
 for i = 1:nr_vcpu
     
    if (release_new(i) ~= 0)
-       label = strcat('v',int2str(i-1),[char(10) 'r'],'elease new');
+       label = strcat('v',int2str(i-1),[char(10) 'r'],'el new');
        h=text(release_new(i),-11.8,label);
        set(h,'Clipping','on')
        mcr_latency_release_new(i) = release_new(i) - mcr(1);
-       disp(strcat('v',int2str(i-1),' mcr_release_new delay=',' ', num2str(mcr_latency_release_new(i)),'ms'));
+      % disp(strcat('v',int2str(i-1),' mcr_release_new delay=',' ', num2str(mcr_latency_release_new(i)),'ms'));
    end
-   label = strcat('v',int2str(i-1),[char(10) 'f'],'nish old');
-   h=text(finish_old(i),-12.6,label);
+   label = strcat('v',int2str(i-1),[char(10) 'f'],'n old');
+   h=text(finish_old(i),-13.6,label);
    set(h,'Clipping','on')
    
    mcr_latency_finish_old(i) = finish_old(i) - mcr(1);
    if ( mcr_latency_finish_old(i) >= 0)
-    disp(strcat('v',int2str(i-1),' mcr_finish_old delay=',' ', num2str(mcr_latency_finish_old(i)),'ms'));
+    %disp(strcat('v',int2str(i-1),' mcr_finish_old delay=',' ', num2str(mcr_latency_finish_old(i)),'ms'));
    end
 end
 
