@@ -1,8 +1,8 @@
 clear; clc;hold on
-%unix('./transfer');
+unix('./transfer');
 benchmark_only=0;
 
-totalTest = 1000;
+totalTest = 100;
 testNum = 0;
 %endpoint 1: the average delay when finishing old jobs for each vcpu.
 %sometimes the mcr happens after all old jobs are finished so the actual
@@ -50,7 +50,7 @@ printTestDetail = 0;
 
 
 while testNum<totalTest
-    testDir = strcat('async_period/16vcpu/test',int2str(testNum),'/');
+    testDir = strcat('modechange/test',int2str(testNum),'/');
     
     %%%%%%%%%%%%%%%%%this block does micro-benchmark
     xen_bench
@@ -72,6 +72,8 @@ while testNum<totalTest
         
         parse_mode_change_info
         
+        plot_mcr        
+        
         plot_sched
         
         
@@ -82,8 +84,7 @@ while testNum<totalTest
         plot_dis_running
         
         plot_backlog
-        
-        plot_mcr
+
         
         plot_unrunnable
         

@@ -9,7 +9,7 @@ function [all_finish_old_and_first_new,end_point3,vcpu_endpoint3] = find_all_fin
             m = mode(vcpu == i-1);
             index = find(m == new_mode(i),1); %find the first job running in the new mode
             while (length(d)> index+1) && (d(index) == d(index+1))%check if preemption happened or not
-                %disp(strcat(['find_all_finish_old job preempted, vcpu:',num2str(i-1)]))
+                disp(strcat(['find_all_finish_old job preempted, vcpu:',num2str(i-1)]))
                 index = index+1;
             end
             timeIndex = find(ms == t(index),1); %find the time of this running job in all sched times
