@@ -5,12 +5,12 @@ C = textscan(fileID,'%*s %u64 %*s %s %*s %*s %*s %*s %s %*s %*s %*s %*s %*s %*s 
 fclose(fileID);
 
 time = C{1};
-delta = C{2};
+%delta = C{2};
 vcpu_ = C{3};
 vcpu = 0;
 
-for i = 1:length(delta)
-    s1 = delta{i};
+for i = 1:length(time)
+%    s1 = delta{i};
     s2 = vcpu_{i};
     %delta{i} = s1(1:end-1);
     vcpu_{i} = s2(end-2:end-1);

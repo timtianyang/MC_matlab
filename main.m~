@@ -78,7 +78,6 @@ while testNum<totalTest
         
         plot_sched
         
-        job_miss
         
         
         plot_release

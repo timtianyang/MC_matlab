@@ -2,12 +2,22 @@ clc
 clear
 close all
 
+normalize=1;
+
 data=load('../endpoints');
 %format:    min_period
 %           min_no_period
 %           max_period
 %           async_period
 %           async_no_period
+
+if normalize == 1
+   data(21:4:40)= data(21:4:40)/12;
+   data(22:4:40)= data(22:4:40)/6;
+   data(23:4:40)= data(23:4:40)/3;
+   data(24:4:40)= data(24:4:40)/1.5;
+end
+
 
 i=1;
 
@@ -35,7 +45,11 @@ hold on
 plot(min_period_release_new,'*-')
 plot(min_period_finish_old,'*-')
 plot(min_period_finish_new_old,'*-')
-title('minimal offset with periodicity protocol')
+if normalize == 1
+    title('minimal offset with periodicity protocol(finish old normalized)')
+else
+    title('minimal offset with periodicity protocol')
+end
 legend('release\_new','finish\_old','finish\_new\_old')
 set(gca,'XTick',[1:4])
 set(gca,'XTickLabel',{'4vcpu','8vcpu','16vcpu','32vcpu'})
@@ -46,7 +60,14 @@ hold on
 plot(min_no_period_release_new,'*-')
 plot(min_no_period_finish_old,'*-')
 plot(min_no_period_finish_new_old,'*-')
-title('minimal offset without periodicity protocol')
+
+
+if normalize == 1
+    title('minimal offset without periodicity protocol(finish old normalized)')
+else
+    title('minimal offset without periodicity protocol')
+end
+
 legend('release\_new','finish\_old','finish\_new\_old')
 set(gca,'XTick',[1:4])
 set(gca,'XTickLabel',{'4vcpu','8vcpu','16vcpu','32vcpu'})
@@ -57,7 +78,13 @@ hold on
 plot(max_period_release_new,'*-')
 plot(max_period_finish_old,'*-')
 plot(max_period_finish_new_old,'*-')
-title('maximum period offset protocol')
+
+if normalize == 1
+    title('maximum period offset protocol(finish old normalized)')
+else
+    title('maximum period offset protocol')
+end
+
 legend('release\_new','finish\_old','finish\_new\_old')
 set(gca,'XTick',[1:4])
 set(gca,'XTickLabel',{'4vcpu','8vcpu','16vcpu','32vcpu'})
@@ -68,7 +95,12 @@ hold on
 plot(async_period_release_new,'*-')
 plot(async_period_finish_old,'*-')
 plot(async_period_finish_new_old,'*-')
-title('async with periodicity protocol')
+
+if normalize == 1
+    title('async with periodicity protocol(finish old normalized)')
+else
+    title('async with periodicity protocol')
+end
 legend('release\_new','finish\_old','finish\_new\_old')
 set(gca,'XTick',[1:4])
 set(gca,'XTickLabel',{'4vcpu','8vcpu','16vcpu','32vcpu'})
@@ -79,7 +111,12 @@ hold on
 plot(async_no_period_release_new,'*-')
 plot(async_no_period_finish_old,'*-')
 plot(async_no_period_finish_new_old,'*-')
-title('async without periodicity protocol')
+
+if normalize == 1
+    title('async without periodicity protocol(finish old normalized)')
+else
+    title('async without periodicity protocol')
+end
 legend('release\_new','finish\_old','finish\_new\_old')
 set(gca,'XTick',[1:4])
 set(gca,'XTickLabel',{'4vcpu','8vcpu','16vcpu','32vcpu'})
@@ -127,7 +164,11 @@ plot(v4_finish_old,'*-')
 plot(v8_finish_old,'*-')
 plot(v16_finish_old,'*-')
 plot(v32_finish_old,'*-')
-title('finish old')
+if normalize == 1
+    title('finish old (normalized)')
+else
+    title('finish old')
+end
 legend('4vcpu','8vcpu','16vcpu','32vcpu')
 set(gca,'XTickLabel',{})
 set(gca,'XTick',[1:5])
@@ -150,6 +191,7 @@ ylabel('ms')
 ax = gca;
 ax.XTickLabelRotation=15;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+return
 
 
 bench=load('../schedule.txt');

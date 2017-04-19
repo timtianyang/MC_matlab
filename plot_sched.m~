@@ -39,8 +39,6 @@ for i = 1:length(vcpu_)
 end
 
 deadline_start = deadline(1);
-time_diff=deadline_start-ms(1);
-ms = ticks_to_ms(time);
  %assume one transition only
 for i = 1:nr_vcpu
     mt = mode(vcpu == i-1);
@@ -52,7 +50,7 @@ end
 
 idle_vcpu_id = 64;
 
-
+ms = ticks_to_ms(time);
 
 for i = 1:(length(time) - 1)
    pos = [ms(i),-10.5, ms(i+1) - ms(i), 10];
@@ -137,14 +135,13 @@ subdeadline=subdeadline(subtime<=end_point3);
 
 jobs_miss_in_mc=0;
 jobs_in_mc=0;
-
 for i=1:length(subtime)
     if subdeadline(i) ~=0
         %find the deadline miss
         if 180014101 == subdeadline(i)-deadline_start
            disp(' ') 
         end
-        if ( subtime(i)+subbudget(i) > subdeadline(i)-time_diff)
+        if ( subtime(i)+subbudget(i) > subdeadline(i))
             %only look at the last schedule instance
             if find(subdeadline(subdeadline==subdeadline(i)),1,'last') == 1
                jobs_miss_in_mc=jobs_miss_in_mc+1;
