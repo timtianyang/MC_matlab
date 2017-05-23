@@ -52,7 +52,7 @@ printTestDetail = 0;
 
 
 while testNum<totalTest
-    testDir = strcat('modechange/test',int2str(testNum),'/');
+    testDir = strcat('case_study/trans1/hybrid/test',int2str(testNum),'/');
     
     %%%%%%%%%%%%%%%%%this block does micro-benchmark
     xen_bench
@@ -167,7 +167,7 @@ while testNum<totalTest
         total_buffer_size = total_buffer_size + buffer_size;
         
         
-        while testNum == 0
+        while testNum >= 1
             w = waitforbuttonpress;
             if w ~= 0
                 break;

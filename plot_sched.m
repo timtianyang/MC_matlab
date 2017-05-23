@@ -135,31 +135,6 @@ subtime=subtime(subtime<=end_point3);
 subbudget=subbudget(subtime<=end_point3);
 subdeadline=subdeadline(subtime<=end_point3);
 
-jobs_miss_in_mc=0;
-jobs_in_mc=0;
-
-for i=1:length(subtime)
-    if subdeadline(i) ~=0
-        %find the deadline miss
-        if 180014101 == subdeadline(i)-deadline_start
-           disp(' ') 
-        end
-        if ( subtime(i)+subbudget(i) > subdeadline(i)-time_diff)
-            %only look at the last schedule instance
-            if find(subdeadline(subdeadline==subdeadline(i)),1,'last') == 1
-               jobs_miss_in_mc=jobs_miss_in_mc+1;
-            else
-               %overwrite the entry as it will appear later
-               subdeadline(i)=0;
-            end
-        end
-    end
-    jobs_in_mc=jobs_in_mc+1;
-end
-
-
-
-
 end_point3_delay = end_point3-mcr(1);
 label = 'endpoint3';
 h=text(end_point3,-16.8,label);
@@ -204,7 +179,7 @@ for i = 1:nr_vcpu
        h=text(release_new(i),-11.8,label);
        set(h,'Clipping','on')
        mcr_latency_release_new(i) = release_new(i) - mcr(1);
-      % disp(strcat('v',int2str(i-1),' mcr_release_new delay=',' ', num2str(mcr_latency_release_new(i)),'ms'));
+       disp(strcat('v',int2str(i-1),' mcr_release_new delay=',' ', num2str(mcr_latency_release_new(i)),'ms'));
    end
    label = strcat('v',int2str(i-1),[char(10) 'f'],'n old');
    h=text(finish_old(i),-13.6,label);
@@ -212,7 +187,7 @@ for i = 1:nr_vcpu
    
    mcr_latency_finish_old(i) = finish_old(i) - mcr(1);
    if ( mcr_latency_finish_old(i) >= 0)
-    %disp(strcat('v',int2str(i-1),' mcr_finish_old delay=',' ', num2str(mcr_latency_finish_old(i)),'ms'));
+    disp(strcat('v',int2str(i-1),' mcr_finish_old delay=',' ', num2str(mcr_latency_finish_old(i)),'ms'));
    end
 end
 

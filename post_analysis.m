@@ -142,7 +142,7 @@ v4_finish_new_old = data(41:4:60);
 v8_finish_new_old = data(42:4:60);
 v16_finish_new_old = data(43:4:60);
 v32_finish_new_old = data(44:4:60);
-
+return
 
 figure(i);i=i+1;
 hold on

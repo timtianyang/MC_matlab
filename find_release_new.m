@@ -26,7 +26,7 @@ function release_new = find_release_new(testDir,nr_vcpu,mc_time)
     for i=1:length(vcpu)
         
        
-        if release_new(vcpu(i)+1) == 0 && ms(i) > mc_time
+        if (release_new(vcpu(i)+1) == 0) && (ms(i) > mc_time)
            
             release_new(vcpu(i)+1) = ms(i);
         end
