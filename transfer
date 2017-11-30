@@ -1,16 +1,1 @@
-#!/bin/bash
-
-echo 'removing old stuff'
-rm -rf ~/MC_matlab/modechange/*
-sleep 2
-
-echo 'creating 1000 folders...'
-~/MC_matlab/mkd
-sleep 2
-
-echo 'copying stuff over from the lab...'
-
-#/home/tim/bbcp/bin/amd64_linux/bbcp -P 2 -V -w 8m -s 16 -r tianyang@158.130.48.14:~/mode_change_scripts/trace_proc_output/* /home/tim/MC_matlab/modechange/
-
-
-scp -r tianyang@158.130.48.14:~/mode_change_scripts/trace_proc_output/* /home/tim/MC_matlab/modechange/
+scp -r tianyang@grw558-1.cis.upenn.edu:~/mode_change_scripts/trace_proc_output/* /home/tim/MC_matlab/modechange/
